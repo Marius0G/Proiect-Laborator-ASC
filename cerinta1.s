@@ -1,16 +1,16 @@
 .section .data
-msg:
-    .ascii "z\n"
+hello:
+    .string "Hello, World!\n"
 
 .section .text
-.global _start
+.globl _start
 
 _start:
-    # Write the message to stdout
+    # Write "Hello, World!" to stdout
     movl $4, %eax        # syscall number for sys_write
     movl $1, %ebx        # file descriptor 1 is stdout
-    movl $msg, %ecx      # pointer to the message
-    movl $2, %edx        # message length
+    movl $hello, %ecx    # pointer to the hello message
+    movl $14, %edx       # number of bytes to write
     int $0x80            # call kernel
 
     # Exit the program
