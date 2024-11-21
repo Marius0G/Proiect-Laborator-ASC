@@ -1,0 +1,3 @@
+as -g -o cerinta1.o cerinta1.s
+ld -g -o cerinta1 cerinta1.o
+./continue

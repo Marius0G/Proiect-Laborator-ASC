@@ -3,7 +3,7 @@ hello:
     .string "Hello, World!\n"
 
 .section .text
-.globl _start
+.global _start
 
 _start:
     # Write "Hello, World!" to stdout
@@ -13,6 +13,7 @@ _start:
     movl $14, %edx       # number of bytes to write
     int $0x80            # call kernel
 
+    et_exit:
     # Exit the program
     movl $1, %eax        # syscall number for sys_exit
     xorl %ebx, %ebx      # exit code 0
