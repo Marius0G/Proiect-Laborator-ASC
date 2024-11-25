@@ -1,0 +1,16 @@
+Ca sa lucrezi cu array in asm:
+a(b,c,d) b+c*d+a
+Atentie! Cand lucram cu arrays, nu putem lasa doar mov, ci va trebui sa sufixam cu tipul de
+date necesar (de exemplu movl pentru arrays cu elemente de tip long).
+In cazul meu am:
+lea memorie, %edi
+(%edi, %eax(index), 1)
+
+Procedura standard la proceduri:
+Baza stivei e ebp
+stiva creste in sus, iar valoarea lui %esp scade
+push %ebp
+mov %esp, %ebp #aici pot sa accesez primul parametru cu 8(%ebp)
+pop %ebp
+
+TRB SA SALVEZ ORICE IN AFARA DE EAX ECX SI EDX

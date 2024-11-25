@@ -1,11 +1,35 @@
 #include <iostream>
+using namespace std;
 
 int memorie[1024] = {0}; //  initializez memoria cu 0
 //vom declara in assembly fiecare element din array ca fiind de spatiu de 1 byte
 //iar in C++ vom folosi un array de 1024 de elemente de tip char
 
+void afisareArrayDebug()
+{
+    for(int i=0; i<20; i++) {
+        cout << memorie[i] << " ";
+    }
+    cout << endl;
+}
 
-using namespace std;
+void get(int descriptor) {
+    int getStartPos = 0;
+    int getFinPos = 0;
+
+    for(int i=0; i<1024; i++) {
+        if(memorie[i] == descriptor && getStartPos == 0) {
+            getStartPos = i;
+        }
+        if(memorie[i] == descriptor && getStartPos != 0) {
+            getFinPos = i;
+        }
+    }
+
+    cout << getStartPos << " " << getFinPos << endl;
+}
+
+
 
 int main() {
 
@@ -19,23 +43,12 @@ int main() {
     int descriptor; // descriptorul fisierului
     cin >> descriptor; // citim descriptorul fisierului(test, normal va fi din fisier)
 
-    int getStartPos = 0;
-    int getFinPos = 0;
-
-    for(int i=0; i<1024; i++) {
-        if(memorie[i] == descriptor && getStartPos == 0) {
-            getStartPos = i;
-        }
-        if(memorie[i] == descriptor && getStartPos != 0) {
-            getFinPos = i;
-        }
-    }
+    
 
     for(int i=0; i<=100; i++) {
         cout << memorie[i] << " ";
     }
-
     cout << endl;
-    cout << descriptor << " " << getStartPos << " " << getFinPos << endl;
+    get(descriptor);
     return 0;
 }
