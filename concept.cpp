@@ -1,6 +1,41 @@
 #include <iostream>
 
+int memorie[1024] = {0}; //  initializez memoria cu 0
+//vom declara in assembly fiecare element din array ca fiind de spatiu de 1 byte
+//iar in C++ vom folosi un array de 1024 de elemente de tip char
+
+
+using namespace std;
+
 int main() {
-    std::cout << "Hello, World!" << std::endl;
+
+    //setare array pentru test
+    memorie[1] = 3;
+    memorie[2] = 7;
+    memorie[3] = 7;
+    memorie[4] = 7;
+    // Implementare GET
+
+    int descriptor; // descriptorul fisierului
+    cin >> descriptor; // citim descriptorul fisierului(test, normal va fi din fisier)
+
+    int getStartPos = 0;
+    int getFinPos = 0;
+
+    for(int i=0; i<1024; i++) {
+        if(memorie[i] == descriptor && getStartPos == 0) {
+            getStartPos = i;
+        }
+        if(memorie[i] == descriptor && getStartPos != 0) {
+            getFinPos = i;
+        }
+    }
+
+    for(int i=0; i<=100; i++) {
+        cout << memorie[i] << " ";
+    }
+
+    cout << endl;
+    cout << descriptor << " " << getStartPos << " " << getFinPos << endl;
     return 0;
 }
