@@ -8,3 +8,4 @@ ld -dynamic-linker /lib/ld-linux.so.2 -o cerinta1 cerinta1.o -lc
 IMPORTANT PT SCANF SI PRINTF(nu stiu cum am facut sa mearga asta pe pc)
 gcc -m32 -o cerinta1 cerinta1.s
 ./cerinta1
+./cerinta1 < input.txt

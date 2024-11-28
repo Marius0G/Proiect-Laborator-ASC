@@ -1,6 +1,7 @@
 .data
-    nr_operatii: .space 4
-    cod_operatie: .space 4 # 1 = ADD, 2 = GET, 3 = DELETE, 4 = DEFRAG
+    nrOperatii: .space 4
+    operatieCurenta: .long 0
+    codOperatie: .space 4 # 1 = ADD, 2 = GET, 3 = DELETE, 4 = DEFRAG
 
     memorie: .space 4096
 
@@ -20,12 +21,17 @@ afisareArrayDebug: #afisare primele 20 de elemente din array ca sa imi dau seama
 loopAfisareArrayDebug1: #folosesc ecx pt index, ebx pt unde sa ma opresc, eax ca sa vad ce sa afisez
     cmp %ecx, %ebx
     je exitAfisareArrayDebug1
-    movl (%edi, %ecx, 4), %eax 
+    mov (%edi, %ecx, 4), %eax 
     push %ecx
     push %eax
     push $formatAfisareDebug
     call printf
     add $8, %esp        
+    pop %ecx
+    push %ecx
+    push $0
+    call fflush # asta ca sa afisez fara endline
+    add $4, %esp
     pop %ecx
     inc %ecx
     jmp loopAfisareArrayDebug1
@@ -37,21 +43,33 @@ exitAfisareArrayDebug1:
 
 main:
     lea memorie, %edi #edi = adresa de inceput a memoriei, o las asa definitiv momentan
+    
+    # Citire numar de operatii
+    push $nrOperatii
+    push $formatCitireGet
+    call scanf
+    addl $8, %esp
 
-//Citim numarul de operatii
-// push $nr_operatii
-// push $formatCitireGet
-// call scanf
-// addl $8, %esp
+    # Initializarea tuturor elementelor din memorie cu 0
+    mov $1024, %ecx
+    loopInitializareMemorie:
+        mov $0, (%edi, %ecx, 4)
+        loop loopInitializareMemorie
 
-// push nr_operatii
-// push $formatAfisareGet
-// call printf
-// addl $8, %esp
+    # Loop mare(iteram de nrOperatii ori)
+    loopNrOperatii:
+        mov operatieCurenta, %ecx
+        cmp nrOperatii, %ecx
+        je exitLoopNrOperatii
+        inc %ecx
+        mov %ecx, operatieCurenta
 
-#Testare debug: afisareArrayDebug
-mov $0, %ecx
-call afisareArrayDebug
+        call afisareArrayDebug
+
+        jmp loopNrOperatii
+
+
+exitLoopNrOperatii:
 
 et_exit: # iesirea din program
 mov $1, %eax
