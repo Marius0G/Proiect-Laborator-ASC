@@ -43,18 +43,21 @@ exitAfisareArrayDebug1:
 
 main:
     lea memorie, %edi #edi = adresa de inceput a memoriei, o las asa definitiv momentan
-    
+
     # Citire numar de operatii
     push $nrOperatii
     push $formatCitireGet
     call scanf
     addl $8, %esp
 
+
     # Initializarea tuturor elementelor din memorie cu 0
-    mov $1024, %ecx
+    lea memorie, %edi
+    mov $1023, %ecx
     loopInitializareMemorie:
         mov $0, (%edi, %ecx, 4)
         loop loopInitializareMemorie
+
 
     # Loop mare(iteram de nrOperatii ori)
     loopNrOperatii:
@@ -64,6 +67,7 @@ main:
         inc %ecx
         mov %ecx, operatieCurenta
 
+        lea memorie, %edi
         call afisareArrayDebug
 
         jmp loopNrOperatii
