@@ -59,21 +59,30 @@ main:
         loop loopInitializareMemorie
 
 
-    # Loop mare(iteram de nrOperatii ori)
-    loopNrOperatii:
+    # Loop principal(iteram de nrOperatii ori)
+    loopPrincipal:
         mov operatieCurenta, %ecx
         cmp nrOperatii, %ecx
-        je exitLoopNrOperatii
+        je exitLoopPrincipal
         inc %ecx
         mov %ecx, operatieCurenta
 
-        lea memorie, %edi
-        call afisareArrayDebug
+        # Citire cod operatie curent
+        push %edi
+        push $codOperatie
+        push $formatCitireGet
+        call scanf
+        addl $8, %esp
+        pop %edi
 
-        jmp loopNrOperatii
+        // lea memorie, %edi
+        // call afisareArrayDebug
+
+        #Final loop principal
+        jmp loopPrincipal
 
 
-exitLoopNrOperatii:
+exitLoopPrincipal:
 
 et_exit: # iesirea din program
 mov $1, %eax
