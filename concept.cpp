@@ -13,23 +13,6 @@ void afisareArrayDebug()
     cout << endl;
 }
 
-void get(int descriptor) {
-    int getStartPos = 0;
-    int getFinPos = 0;
-
-    for(int i=0; i<1024; i++) {
-        if(memorie[i] == descriptor && getStartPos == 0) {
-            getStartPos = i;
-        }
-        if(memorie[i] == descriptor && getStartPos != 0) {
-            getFinPos = i;
-        }
-    }
-
-    cout << getStartPos << " " << getFinPos << endl;
-}
-
-
 
 int main() {
 
@@ -42,13 +25,20 @@ int main() {
 
     int descriptor; // descriptorul fisierului
     cin >> descriptor; // citim descriptorul fisierului(test, normal va fi din fisier)
+    // afisareArrayDebug();
+    // Operatia GET
+    int getStartPos = 0;
+    int getFinPos = 0;
 
-    
-
-    for(int i=0; i<=100; i++) {
-        cout << memorie[i] << " ";
+    for(int i=0; i<1024; i++) {
+        if(memorie[i] == descriptor && getStartPos == 0) {
+            getStartPos = i;
+        }
+        if(memorie[i] == descriptor && getStartPos != 0) {
+            getFinPos = i;
+        }
     }
-    cout << endl;
-    get(descriptor);
+
+    cout << getStartPos << " " << getFinPos;
     return 0;
 }
