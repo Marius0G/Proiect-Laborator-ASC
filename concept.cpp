@@ -18,9 +18,9 @@ int main() {
 
     //setare array pentru test
     memorie[1] = 3;
-    memorie[2] = 7;
-    memorie[3] = 7;
     memorie[4] = 7;
+    memorie[5] = 7;
+    memorie[6] = 7;
     // Implementare GET
 
     // int descriptor; // descriptorul fisierului
@@ -40,10 +40,51 @@ int main() {
     // }
 
     // cout << getStartPos << " " << getFinPos;
-
+    afisareArrayDebug();
     //Implementare ADD
+    int nAdd;
     int descriptorAdd;
-    cin >> descriptorAdd;
-    int spatiuAdd =
+    int spatiuAddKb;
+    int spatiuAddBlocuri;
+    cin >> nAdd;
+    for(int i=0; i<nAdd; i++) {
+        cin >> descriptorAdd;
+        cin >> spatiuAddKb;
+        //se calculeaaza nr de spatii de care avem nevoie
+        if(spatiuAddKb % 8 == 0)
+        {
+            spatiuAddBlocuri = spatiuAddKb / 8;
+        }
+        else
+        {
+            spatiuAddBlocuri = spatiuAddKb / 8 + 1;
+        }
+
+        // se cauta un spatiu liber, se vede unde se poate adauga
+        int addStartPos = 0;
+        int addFinPos = 0;
+        int nrBlocuriLibere = 0;
+        for(int i=0; i<1024; i++) {
+            if(nrBlocuriLibere != 0 && memorie[i] == 0) {
+                nrBlocuriLibere++;
+            }
+            if(nrBlocuriLibere == 0 && memorie[i] == 0) {
+                addStartPos = i;
+                nrBlocuriLibere++;
+            }
+            if(nrBlocuriLibere != 0 && memorie[i] != 0) {
+                nrBlocuriLibere = 0;
+            }
+            if(nrBlocuriLibere == spatiuAddBlocuri) {
+                addFinPos = i;
+                break;
+            }
+        }
+        for(int i=addStartPos; i<=addFinPos; i++) {
+            memorie[i] = descriptorAdd;
+        }
+        afisareArrayDebug();    
+    }
+
     return 0;
 }
