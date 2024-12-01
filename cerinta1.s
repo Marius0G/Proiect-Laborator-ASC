@@ -85,12 +85,19 @@ main:
         pop %edi
 
         # Verific daca codul operatiei este 1(ADD)
-        
+        cmp $1, codOperatie
+        je operatieAdd
+        jmp verificareCodOperatieGet
+        operatieAdd:
+
+            jmp exitOperatie
+            #SFARSIT OPERATIE ADD
 
         # Verific daca codul operatiei este 2(GET)
+        verificareCodOperatieGet:
         cmp $2, codOperatie
         je operatieGet
-        jmp exitOperatie
+        jmp verificareCodOperatieDelete
         operatieGet:
             # Citire descriptor
             push %edi
@@ -139,7 +146,23 @@ main:
             #SFARSIT OPERATIE GET
 
         # Verific daca codul operatiei este 3(DELETE)
+        verificareCodOperatieDelete:
+        cmp $3, codOperatie
+        je operatieDelete
+        jmp verificareCodOperatieDefrag
+        operatieDelete:
+            jmp exitOperatie
+            #SFARSIT OPERATIE DELETE
 
+        # Verific daca codul operatiei este 4(DEFRAG)
+        verificareCodOperatieDefrag:
+        cmp $4, codOperatie
+        je operatieDefrag
+        jmp exitOperatie
+        operatieDefrag:
+            jmp exitOperatie
+            #SFARSIT OPERATIE DEFRAG
+        
         exitOperatie:
 
         #Final loop principal
