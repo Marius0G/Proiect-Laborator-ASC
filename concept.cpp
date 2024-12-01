@@ -23,22 +23,27 @@ int main() {
     memorie[4] = 7;
     // Implementare GET
 
-    int descriptor; // descriptorul fisierului
-    cin >> descriptor; // citim descriptorul fisierului(test, normal va fi din fisier)
-    // afisareArrayDebug();
-    // Operatia GET
-    int getStartPos = 0;
-    int getFinPos = 0;
+    // int descriptor; // descriptorul fisierului
+    // cin >> descriptor; // citim descriptorul fisierului(test, normal va fi din fisier)
+    // // afisareArrayDebug();
+    // // Operatia GET
+    // int getStartPos = 0;
+    // int getFinPos = 0;
 
-    for(int i=0; i<1024; i++) {
-        if(memorie[i] == descriptor && getStartPos == 0) {
-            getStartPos = i;
-        }
-        if(memorie[i] == descriptor && getStartPos != 0) {
-            getFinPos = i;
-        }
-    }
+    // for(int i=0; i<1024; i++) {
+    //     if(memorie[i] == descriptor && getStartPos == 0) {
+    //         getStartPos = i;
+    //     }
+    //     if(memorie[i] == descriptor && getStartPos != 0) {
+    //         getFinPos = i;
+    //     }
+    // }
 
-    cout << getStartPos << " " << getFinPos;
+    // cout << getStartPos << " " << getFinPos;
+
+    //Implementare ADD
+    int descriptorAdd;
+    cin >> descriptorAdd;
+    int spatiuAdd =
     return 0;
 }
