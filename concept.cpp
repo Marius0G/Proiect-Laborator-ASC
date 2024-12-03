@@ -63,19 +63,19 @@ int main() {
         // se cauta un spatiu liber, se vede unde se poate adauga
         int addStartPos = 0;
         int addFinPos = 0;
-        int nrBlocuriLibere = 0;
+        int addNrBlocuriLibere = 0;
         for(int i=0; i<1024; i++) {
-            if(nrBlocuriLibere != 0 && memorie[i] == 0) {
-                nrBlocuriLibere++;
+            if(addNrBlocuriLibere != 0 && memorie[i] == 0) {
+                addNrBlocuriLibere++;
             }
-            if(nrBlocuriLibere == 0 && memorie[i] == 0) {
+            if(addNrBlocuriLibere == 0 && memorie[i] == 0) {
                 addStartPos = i;
-                nrBlocuriLibere++;
+                addNrBlocuriLibere++;
             }
-            if(nrBlocuriLibere != 0 && memorie[i] != 0) {
-                nrBlocuriLibere = 0;
+            if(addNrBlocuriLibere != 0 && memorie[i] != 0) {
+                addNrBlocuriLibere = 0;
             }
-            if(nrBlocuriLibere == spatiuAddBlocuri) {
+            if(addNrBlocuriLibere == spatiuAddBlocuri) {
                 addFinPos = i;
                 break;
             }
