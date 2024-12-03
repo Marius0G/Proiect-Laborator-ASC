@@ -15,6 +15,7 @@
     addFinPos: .long 0
     addNrBlocuriLibere: .long 0
     operatieCurentaAdd: .long 0
+    formatAfisareAdd: .asciz "%d: (%d, %d)\n"
     # Variabile pentru operatia GET
     descriptorGet: .space 4
     getStartPos: .space 4
@@ -136,7 +137,88 @@ main:
             calculeazaSpatiuAddBlocuri:
             mov %eax, spatiuAddBlocuri
 
-            
+            #se cauta un spatiu liber, se vede unde se poate adauga
+            lea memorie, %edi
+            mov $0, addStartPos
+            mov $0, addFinPos
+            mov $0, addNrBlocuriLibere
+            mov $0, %ecx
+            mov $1024, %ebx
+            loopAdd2:
+            cmp %ecx, %ebx
+            je exitLoopAdd2
+
+            addIf1:  # addNrBlocuriLibere != 0 && memorie[i] == 0
+            mov addNrBlocuriLibere, %eax
+            cmp $0, %eax
+            je addIf2
+            mov (%edi, %ecx, 4), %eax
+            cmp $0, %eax
+            jne addIf2
+            # adunam 1 la addNrBlocuriLibere
+            mov addNrBlocuriLibere, %eax
+            inc %eax
+            mov %eax, addNrBlocuriLibere
+
+            addIf2:  # addNrBlocuriLibere == 0 && memorie[i] == 0
+            mov addNrBlocuriLibere, %eax
+            cmp $0, %eax
+            jne addIf3
+            mov (%edi, %ecx, 4), %eax
+            cmp $0, %eax
+            jne addIf3
+            # setam addStartPos cu i
+            mov %ecx, addStartPos
+            # adun 1 la addNrBlocuriLibere
+            mov addNrBlocuriLibere, %eax
+            inc %eax
+            mov %eax, addNrBlocuriLibere
+
+            addIf3: # addNrBlocuriLibere != 0 && memorie[i] != 0
+            mov addNrBlocuriLibere, %eax
+            cmp $0, %eax
+            je addIf4
+            mov (%edi, %ecx, 4), %eax
+            cmp $0, %eax
+            je addIf4
+            mov $0, addNrBlocuriLibere
+
+            addIf4:  #addNrBlocuriLibere == spatiuAddBlocuri
+            mov addNrBlocuriLibere, %eax
+            cmp spatiuAddBlocuri, %eax
+            jne exitAddIf
+            # setam addFinPos cu i
+            mov %ecx, addFinPos
+            # iesim din loop
+            jmp exitLoopAdd2
+            exitAddIf:
+            inc %ecx
+            jmp loopAdd2
+
+            exitLoopAdd2: #MODIFICAREA ARRAY-ULUI
+            lea memorie, %edi
+            mov addStartPos, %ecx
+            mov addFinPos, %ebx
+            inc %ebx
+            loopAdd3:
+            cmp %ebx, %ecx
+            je exitLoopAdd3
+            mov descriptorAdd, %eax
+            mov %eax, (%edi, %ecx, 4)
+            inc %ecx
+            jmp loopAdd3
+            exitLoopAdd3:
+            # Afisare rezultat
+            push addFinPos
+            push addStartPos
+            push descriptorAdd
+            push $formatAfisareAdd
+            call printf
+            add $16, %esp
+
+            # afisareArrayDebug
+            lea memorie, %edi
+            call afisareArrayDebug
             jmp loopAdd1
             exitLoopAdd1:
 

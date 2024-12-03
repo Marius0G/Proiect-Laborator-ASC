@@ -77,6 +77,7 @@ int main() {
             }
             if(addNrBlocuriLibere == spatiuAddBlocuri) {
                 addFinPos = i;
+                cout << addStartPos << " " << addFinPos << endl;
                 break;
             }
         }
