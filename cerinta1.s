@@ -21,10 +21,21 @@
     getStartPos: .space 4
     getFinPos: .space 4
 
+    # Variabile pentru operatia DELETE
+    descriptorDelete: .space 4
+    deleteStartPos: .space 4
+    deleteFinPos: .space 4
+
+    startAfisareVector: .long 0
+    endAfisareVector: .long 0
+
+    # Variabile pentru operatia DEFRAG
+
     # Variabile de afisare
     formatAfisareDebug: .asciz "%d "
     formatCitireGet: .asciz "%d"
     formatAfisareGet: .asciz "(%d, %d)\n"
+    formatAfisareVector: .asciz "%d: (%d, %d)\n"
 .text
 .global main
 
@@ -283,6 +294,99 @@ main:
         je operatieDelete
         jmp verificareCodOperatieDefrag
         operatieDelete:
+            # Citire descriptor care trebuie sters
+            push $descriptorDelete
+            push $formatCitireGet
+            call scanf
+            add $8, %esp
+
+            # Cautare descriptor in memorie
+            #Intru in for (for(int i=0; i<1024; i++) )
+            lea memorie, %edi
+            mov $0, deleteStartPos
+            mov $0, deleteFinPos
+            mov $0, %ecx
+            mov $1024, %ebx
+            loopDelete1:
+            cmp %ecx, %ebx
+            je exitLoopDelete1
+            # memorie[i] == descriptorDelete 
+            mov (%edi, %ecx, 4), %eax
+            cmp descriptorDelete, %eax
+            jne iteratieDelete1
+            # deleteStartPos == 0
+            mov deleteStartPos, %eax
+            cmp $0, %eax
+            jne iteratieDelete2
+            # setez deleteStartPos cu i
+            mov %ecx, deleteStartPos
+            iteratieDelete2:
+            # setez deleteFinPos cu i
+            mov %ecx, deleteFinPos
+            iteratieDelete1:
+
+            inc %ecx
+            jmp loopDelete1
+            exitLoopDelete1:
+            # Acum sterg efectiv valorile
+            mov deleteFinPos, %edx
+            inc %edx
+            mov %edx, deleteFinPos
+            mov deleteStartPos, %ecx
+            mov deleteFinPos, %ebx
+            loopDelete2:
+            cmp %ebx, %ecx
+            je exitLoopDelete2
+            mov $0, (%edi, %ecx, 4)
+            inc %ecx
+            jmp loopDelete2
+            exitLoopDelete2:
+
+            # Afisare tot vectorul
+            lea memorie, %edi
+            # Loop de la 0 la 1023
+            mov $0, %ecx
+            mov $1024, %ebx
+            loopAfisareVector1:
+                lea memorie, %edi
+                cmp %ecx, %ebx
+                je exitLoopAfisareVector1
+                # Verific daca elementul curent este diferit de 0
+                mov (%edi, %ecx, 4), %eax
+                cmp $0, %eax
+                je iteratieAfisareVector1
+                # Definesc start si end cu ecx
+                mov %ecx, startAfisareVector
+                mov %ecx, endAfisareVector
+                # Cat timp memorie[end] == memorie[start], incrementez end
+                loopAfisareVector2:
+                    mov (%edi, %ecx, 4), %eax
+                    mov endAfisareVector, %edx
+                    cmp %eax, (%edi, %edx, 4)
+                    jne exitLoopAfisareVector2
+                    mov endAfisareVector, %edx
+                    inc %edx
+                    mov %edx, endAfisareVector
+                    jmp loopAfisareVector2
+                exitLoopAfisareVector2:
+                    mov endAfisareVector, %edx
+                    dec %edx
+                    mov %edx, endAfisareVector
+                    push endAfisareVector
+                    push startAfisareVector
+                    push (%edi, %ecx, 4)
+                    push $formatAfisareVector
+                    call printf
+                    add $16, %esp
+                    mov endAfisareVector, %edx
+                    mov %edx, %ecx
+
+                iteratieAfisareVector1:
+                inc %ecx
+                jmp loopAfisareVector1
+                # AM TERMINAT DE AFISAT VECTORUL
+
+            exitLoopAfisareVector1:
             jmp exitOperatie
             #SFARSIT OPERATIE DELETE
 
@@ -292,6 +396,87 @@ main:
         je operatieDefrag
         jmp exitOperatie
         operatieDefrag:
+            # De fiecare data cand intalnesc 0, mut tot ce e dupa el cu o pozitie in fata
+            #for de la 0 la 1023
+            lea memorie, %edi
+            mov $0, %ecx
+            mov $1024, %ebx
+            loopDefrag1:
+            cmp %ecx, %ebx
+            je exitLoopDefrag1
+            # Daca elementul curent este diferit de 0, sar peste
+            mov (%edi, %ecx, 4), %eax
+            cmp $0, %eax
+            jne iteratieDefrag1
+            # for(int j=i+1; j<1024; j++)
+            mov %ecx, %edx
+            inc %edx
+            mov $1024, %ebx
+            loopDefrag2:
+            cmp %ebx, %edx
+            je exitLoopDefrag2
+            # Daca elementul curent este egal cu 0, sar peste
+            mov (%edi, %edx, 4), %eax
+            cmp $0, %eax
+            je iteratieDefrag2
+            mov (%edi, %edx, 4), %eax
+            mov %eax, (%edi, %ecx, 4)
+            mov $0, (%edi, %edx, 4)
+            jmp exitLoopDefrag2
+            iteratieDefrag2:
+            inc %edx
+            jmp loopDefrag2
+            exitLoopDefrag2:
+            iteratieDefrag1:
+            inc %ecx
+            jmp loopDefrag1
+            exitLoopDefrag1:
+            # Afisare tot vectorul
+            lea memorie, %edi
+            # Loop de la 0 la 1023
+            mov $0, %ecx
+            mov $1024, %ebx
+            loopAfisareVector1defrag:
+                lea memorie, %edi
+                cmp %ecx, %ebx
+                je exitLoopAfisareVector1defrag
+                # Verific daca elementul curent este diferit de 0
+                mov (%edi, %ecx, 4), %eax
+                cmp $0, %eax
+                je iteratieAfisareVector1defrag
+                # Definesc start si end cu ecx
+                mov %ecx, startAfisareVector
+                mov %ecx, endAfisareVector
+                # Cat timp memorie[end] == memorie[start], incrementez end
+                loopAfisareVector2defrag:
+                    mov (%edi, %ecx, 4), %eax
+                    mov endAfisareVector, %edx
+                    cmp %eax, (%edi, %edx, 4)
+                    jne exitLoopAfisareVector2defrag
+                    mov endAfisareVector, %edx
+                    inc %edx
+                    mov %edx, endAfisareVector
+                    jmp loopAfisareVector2defrag
+                exitLoopAfisareVector2defrag:
+                    mov endAfisareVector, %edx
+                    dec %edx
+                    mov %edx, endAfisareVector
+                    push endAfisareVector
+                    push startAfisareVector
+                    push (%edi, %ecx, 4)
+                    push $formatAfisareVector
+                    call printf
+                    add $16, %esp
+                    mov endAfisareVector, %edx
+                    mov %edx, %ecx
+
+                iteratieAfisareVector1defrag:
+                inc %ecx
+                jmp loopAfisareVector1defrag
+                exitLoopAfisareVector1defrag:
+                jmp exitOperatie
+                # AM TERMINAT DE AFISAT VECTORUL
+
             jmp exitOperatie
             #SFARSIT OPERATIE DEFRAG
         
