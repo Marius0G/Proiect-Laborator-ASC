@@ -4,7 +4,7 @@
     operatieCurentaLoopPrincipal: .long 0
     codOperatie: .space 4 # 1 = ADD, 2 = GET, 3 = DELETE, 4 = DEFRAG
     # Variabila pentru array ul de memorie
-    memorie: .space 4096
+    memorie: .space 4100
 
     # Variabile pentru operatia ADD
     nAdd: .space 4
@@ -157,7 +157,9 @@ main:
             mov $1024, %ebx
             loopAdd2:
             cmp %ecx, %ebx
-            je exitLoopAdd2
+            je cazSpecialAdd
+
+            #DE FACUT CAZ EXCEPTIE DACA NU POATE FI ADAUGAT
 
             addIf1:  # addNrBlocuriLibere != 0 && memorie[i] == 0
             mov addNrBlocuriLibere, %eax
@@ -206,6 +208,11 @@ main:
             inc %ecx
             jmp loopAdd2
 
+            cazSpecialAdd:
+            mov $0, addStartPos
+            mov $0, addFinPos
+            
+            jmp exitLoopAdd3
             exitLoopAdd2: #MODIFICAREA ARRAY-ULUI
             lea memorie, %edi
             mov addStartPos, %ecx
@@ -229,7 +236,7 @@ main:
 
             # afisareArrayDebug
             lea memorie, %edi
-            call afisareArrayDebug
+            // call afisareArrayDebug
             jmp loopAdd1
             exitLoopAdd1:
 

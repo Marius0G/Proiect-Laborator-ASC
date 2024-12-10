@@ -65,6 +65,7 @@ int main() {
     //     int addStartPos = 0;
     //     int addFinPos = 0;
     //     int addNrBlocuriLibere = 0;
+    //     bool foundSpace = false;
     //     for(int i=0; i<1024; i++) {
     //         if(addNrBlocuriLibere != 0 && memorie[i] == 0) {
     //             addNrBlocuriLibere++;
@@ -79,8 +80,12 @@ int main() {
     //         if(addNrBlocuriLibere == spatiuAddBlocuri) {
     //             addFinPos = i;
     //             cout << addStartPos << " " << addFinPos << endl;
+    //             foundSpace = true;
     //             break;
     //         }
+    //     }
+    //     if (!foundSpace) {
+    //         cout << "0 0" << endl;
     //     }
     //     for(int i=addStartPos; i<=addFinPos; i++) {
     //         memorie[i] = descriptorAdd;
