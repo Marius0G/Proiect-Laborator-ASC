@@ -340,6 +340,11 @@ main:
             inc %edx
             mov %edx, deleteFinPos
             mov deleteStartPos, %ecx
+            #Verifi daca deleteStartPos e 1
+            cmp $1, %ecx
+            jne continueDelete
+            mov $0, %ecx
+            continueDelete:
             mov deleteFinPos, %ebx
             loopDelete2:
             cmp %ebx, %ecx
