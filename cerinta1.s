@@ -4,7 +4,7 @@
     operatieCurentaLoopPrincipal: .long 0
     codOperatie: .space 4 # 1 = ADD, 2 = GET, 3 = DELETE, 4 = DEFRAG
     # Variabila pentru array ul de memorie
-    memorie: .space 4100
+    memorie: .space 4096
 
     # Variabile pentru operatia ADD
     nAdd: .space 4
