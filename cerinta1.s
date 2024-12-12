@@ -243,7 +243,7 @@ main:
             add $4, %esp
 
             # afisareArrayDebug
-            lea memorie, ./%edi
+            lea memorie, %edi
             // call afisareArrayDebug
             jmp loopAdd1
             exitLoopAdd1:
