@@ -227,11 +227,6 @@ main:
             jmp loopAdd3
             exitLoopAdd3:
             # Afisare rezultat
-            mov addStartPos, %eax
-            cmp $1, %eax
-            jne continueAdd
-            mov $0, addStartPos
-            continueAdd:
             push addFinPos
             push addStartPos
             push descriptorAdd
@@ -243,7 +238,7 @@ main:
             add $4, %esp
 
             # afisareArrayDebug
-            lea memorie, ./%edi
+            lea memorie, %edi
             // call afisareArrayDebug
             jmp loopAdd1
             exitLoopAdd1:
@@ -399,6 +394,11 @@ main:
                     mov endAfisareVector, %edx
                     dec %edx
                     mov %edx, endAfisareVector
+                    cmp $1, startAfisareVector
+                    jne continueAfisareVector1
+                    mov $0, startAfisareVector
+                    continueAfisareVector1:
+
                     push endAfisareVector
                     push startAfisareVector
                     push (%edi, %ecx, 4)
