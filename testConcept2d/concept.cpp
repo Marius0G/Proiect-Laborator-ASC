@@ -142,9 +142,11 @@ int main()
         if (operatie == 4) // DEFRAG
         {
             // Implementare DEFRAG
-            for (int i = 0; i < 1023; i++) // parcurgem liniile, până la penultima linie
+            // Implementare DEFRAG
+            for (int i = 0; i < 1023; i++) // Parcurgem liniile, până la penultima linie
             {
-                int k = 0; // index pentru a ține evidența poziției de inserare pe linia curentă
+                int k = 0; // Index pentru poziția de inserare pe linia curentă
+                // Compactăm valorile nenule pe linia curentă
                 for (int j = 0; j < 1024; j++)
                 {
                     if (memorie[i * 1024 + j] != 0)
@@ -158,37 +160,49 @@ int main()
                     }
                 }
 
-                // Mutăm valorile nenule de pe linia următoare, dacă există spațiu
-                int nextLineIndex = (i + 1) * 1024;
-                for (int j = 0; j < 1024;)
+                // Mutăm valorile din liniile următoare pe linia curentă
+                for (int l = i + 1; l < 1024; l++) // Iterăm toate liniile de dedesubt
                 {
-                    if (memorie[nextLineIndex + j] != 0)
+                    int nextLineIndex = l * 1024;
+                    for (int j = 0; j < 1024;)
                     {
-                        int descriptor = memorie[nextLineIndex + j];
-                        int count = 0;
-                        while (j + count < 1024 && memorie[nextLineIndex + j + count] == descriptor)
+                        if (memorie[nextLineIndex + j] != 0)
                         {
-                            count++;
-                        }
+                            int descriptor = memorie[nextLineIndex + j];
+                            int count = 0;
 
-                        if (k + count <= 1024) // Verificăm dacă întregul descriptor încape pe linia curentă
-                        {
-                            for (int l = 0; l < count; l++)
+                            // Determinăm lungimea grupului (descriptorului)
+                            while (j + count < 1024 && memorie[nextLineIndex + j + count] == descriptor)
                             {
-                                memorie[i * 1024 + k] = memorie[nextLineIndex + j];
-                                memorie[nextLineIndex + j] = 0;
-                                k++;
-                                j++;
+                                count++;
+                            }
+
+                            // Verificăm dacă întreg grupul încape pe linia curentă
+                            if (k + count <= 1024)
+                            {
+                                for (int m = 0; m < count; m++)
+                                {
+                                    memorie[i * 1024 + k] = memorie[nextLineIndex + j];
+                                    memorie[nextLineIndex + j] = 0;
+                                    k++;
+                                    j++;
+                                }
+                            }
+                            else
+                            {
+                                break; // Dacă nu încape întregul grup, oprim mutarea
                             }
                         }
                         else
                         {
-                            break; // Renunțăm la mutare dacă primul descriptor nu încape
+                            j++;
                         }
                     }
-                    else
+
+                    // Dacă linia curentă este plină, ieșim din buclă
+                    if (k == 1024)
                     {
-                        j++;
+                        break;
                     }
                 }
             }
