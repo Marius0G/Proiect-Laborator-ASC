@@ -1,0 +1,41 @@
+#include <stdio.h>
+#include <string.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+
+char *filepath;
+
+int main()
+{
+    int fds = open(filepath, O_RDONLY);
+    int fd = (fds % 255) + 1;
+    struct stat fileStat;
+    fstat(fds, &fileStat);
+    long size = fileStat.st_size / 1024;
+
+}
+
+main:
+        leal    4(%esp), %ecx
+        andl    $-16, %esp
+        pushl   -4(%ecx)
+        pushl   %ebp
+        movl    %esp, %ebp
+        pushl   %ecx
+        subl    $108, %esp
+        pushl   $0
+        pushl   filepath
+        call    open
+        addl    $8, %esp
+        leal    -96(%ebp), %edx
+        pushl   %edx
+        pushl   %eax
+        call    fstat
+        addl    $16, %esp
+        movl    $0, %eax
+        movl    -4(%ebp), %ecx
+        leave
+        leal    -4(%ecx), %esp
+        ret
+filepath:
+        .zero   4
