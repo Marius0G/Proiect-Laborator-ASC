@@ -384,6 +384,10 @@ main:
                 je iteratieAfisareVector1
                 # Definesc start si end cu ecx
                 mov %ecx, startAfisareVector
+                cmp $1, %ecx
+                jne fixIterationAfisareVector1
+                mov $0, startAfisareVector
+                fixIterationAfisareVector1:
                 mov %ecx, endAfisareVector
                 # Cat timp memorie[end] == memorie[start], incrementez end
                 loopAfisareVector2:
@@ -421,46 +425,48 @@ main:
             #SFARSIT OPERATIE DELETE
 
         # Verific daca codul operatiei este 4(DEFRAG)
+        # Verific daca codul operatiei este 4(DEFRAG)
         verificareCodOperatieDefrag:
-        cmp $4, codOperatie
-        je operatieDefrag
-        jmp exitOperatie
+            cmp $4, codOperatie
+            je operatieDefrag
+            jmp exitOperatie
+
         operatieDefrag:
-            # De fiecare data cand intalnesc 0, mut tot ce e dupa el cu o pozitie in fata
-            #for de la 0 la 1023
-            lea memorie, %edi
-            mov $0, %ecx
-            mov $1024, %ebx
+            # Initializez indexurile pentru iterare
+            lea memorie, %edi        # Adresa de început a memoriei
+            mov $0, %ecx             # Indexul curent în memorie
+            mov $0, %edx             # Indexul unde pun elementele nenule
+
             loopDefrag1:
-            cmp %ecx, %ebx
-            je exitLoopDefrag1
-            # Daca elementul curent este diferit de 0, sar peste
-            mov (%edi, %ecx, 4), %eax
-            cmp $0, %eax
-            jne iteratieDefrag1
-            # for(int j=i+1; j<1024; j++)
-            mov %ecx, %edx
-            inc %edx
-            mov $1024, %ebx
-            loopDefrag2:
-            cmp %ebx, %edx
-            je exitLoopDefrag2
-            # Daca elementul curent este egal cu 0, sar peste
-            mov (%edi, %edx, 4), %eax
-            cmp $0, %eax
-            je iteratieDefrag2
-            mov (%edi, %edx, 4), %eax
-            mov %eax, (%edi, %ecx, 4)
-            mov $0, (%edi, %edx, 4)
-            jmp exitLoopDefrag2
-            iteratieDefrag2:
-            inc %edx
-            jmp loopDefrag2
-            exitLoopDefrag2:
-            iteratieDefrag1:
-            inc %ecx
-            jmp loopDefrag1
+                cmp $1024, %ecx      # Dacă am iterat tot vectorul, terminăm
+                je exitLoopDefrag1
+
+                mov (%edi, %ecx, 4), %eax # Încarc valoarea din memorie[ecx] în eax
+                cmp $0, %eax             # Verific dacă valoarea este 0
+                je nextIterationDefrag   # Dacă e 0, trec la următoarea iterație
+
+                # Dacă valoarea nu este 0, o mut la poziția indicată de edx
+                mov %eax, (%edi, %edx, 4)
+                inc %edx                 # Incrementăm indexul unde am pus elementul nenul
+
+            nextIterationDefrag:
+                inc %ecx                 # Incrementăm indexul curent în memorie
+                jmp loopDefrag1
+
             exitLoopDefrag1:
+                # Setăm restul vectorului la 0
+                mov %edx, %ecx           # Continuăm de la indexul unde am pus ultimul element nenul
+                loopSetZero:
+                    cmp $1024, %ecx      # Dacă am iterat tot vectorul, terminăm
+                    je exitLoopSetZero
+                    mov $0, (%edi, %ecx, 4) # Setăm valoarea la 0
+                    inc %ecx             # Incrementăm indexul curent în memorie
+                    jmp loopSetZero
+
+            exitLoopSetZero:
+                jmp exitLoopDefrag2
+
+            exitLoopDefrag2:
             # Afisare tot vectorul
             lea memorie, %edi
             # Loop de la 0 la 1023
@@ -497,9 +503,6 @@ main:
                     push $formatAfisareVector
                     call printf
                     add $16, %esp
-                    push $0
-                    call fflush # asta ca sa afisez fara endline
-                    add $4, %esp
                     mov endAfisareVector, %edx
                     mov %edx, %ecx
 
@@ -522,7 +525,11 @@ main:
 exitLoopPrincipal:
 
 et_exit: # iesirea din program
-mov $1, %eax
-xor %ebx, %ebx
-int $0x80
+    pushl $0
+    call fflush
+    popl %eax
+    
+    movl $1, %eax
+    xorl %ebx, %ebx
+    int $0x80
     
