@@ -406,34 +406,34 @@ main:
 
         operatieDefrag:
             # Initializez indexurile pentru iterare
-            lea memorie, %edi        # Adresa de început a memoriei
-            mov $0, %ecx             # Indexul curent în memorie
-            mov $0, %edx             # Indexul unde pun elementele nenule
+            lea memorie, %edi        
+            mov $0, %ecx             
+            mov $0, %edx             
 
             loopDefrag1:
-                cmp $1024, %ecx      # Dacă am iterat tot vectorul, terminăm
+                cmp $1024, %ecx     
                 je exitLoopDefrag1
 
-                mov (%edi, %ecx, 4), %eax # Încarc valoarea din memorie[ecx] în eax
-                cmp $0, %eax             # Verific dacă valoarea este 0
-                je nextIterationDefrag   # Dacă e 0, trec la următoarea iterație
+                mov (%edi, %ecx, 4), %eax
+                cmp $0, %eax             
+                je nextIterationDefrag   
 
-                # Dacă valoarea nu este 0, o mut la poziția indicată de edx
+                
                 mov %eax, (%edi, %edx, 4)
-                inc %edx                 # Incrementăm indexul unde am pus elementul nenul
+                inc %edx                
 
             nextIterationDefrag:
-                inc %ecx                 # Incrementăm indexul curent în memorie
+                inc %ecx                
                 jmp loopDefrag1
 
             exitLoopDefrag1:
-                # Setăm restul vectorului la 0
-                mov %edx, %ecx           # Continuăm de la indexul unde am pus ultimul element nenul
+               
+                mov %edx, %ecx           
                 loopSetZero:
-                    cmp $1024, %ecx      # Dacă am iterat tot vectorul, terminăm
+                    cmp $1024, %ecx      
                     je exitLoopSetZero
-                    mov $0, (%edi, %ecx, 4) # Setăm valoarea la 0
-                    inc %ecx             # Incrementăm indexul curent în memorie
+                    mov $0, (%edi, %ecx, 4)
+                    inc %ecx            
                     jmp loopSetZero
 
             exitLoopSetZero:
