@@ -206,22 +206,6 @@ int main()
                 }
             }
 
-            // Ultima linie
-            int k = 0;
-            for (int j = 0; j < 1024; j++)
-            {
-                if (memorie[1023 * 1024 + j] != 0)
-                {
-                    memorie[1023 * 1024 + k] = memorie[1023 * 1024 + j];
-                    if (k != j)
-                    {
-                        memorie[1023 * 1024 + j] = 0;
-                    }
-                    k++;
-                }
-            }
-
-
         // afisare dupa defrag
         // Afișare toată memoria sub forma ((linieStart, coloanaStart), (linieEnd, coloanaEnd))
             for (int i = 0; i < 1024; i++) // parcurgem liniile

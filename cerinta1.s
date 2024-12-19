@@ -433,7 +433,7 @@ main:
                     cmp $1024, %ecx      
                     je exitLoopSetZero
                     mov $0, (%edi, %ecx, 4)
-                    inc %ecx            
+                    inc %ecx             # Incrementăm indexul curent în memorie
                     jmp loopSetZero
 
             exitLoopSetZero:
