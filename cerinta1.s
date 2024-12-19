@@ -325,8 +325,6 @@ main:
             # Cautare descriptor in memorie
             #Intru in for (for(int i=0; i<1024; i++) )
             lea memorie, %edi
-            mov $0, deleteStartPos
-            mov $0, deleteFinPos
             mov $0, %ecx
             mov $1024, %ebx
             loopDelete1:
@@ -336,38 +334,13 @@ main:
             mov (%edi, %ecx, 4), %eax
             cmp descriptorDelete, %eax
             jne iteratieDelete1
-            # deleteStartPos == 0
-            mov deleteStartPos, %eax
-            cmp $0, %eax
-            jne iteratieDelete2
-            # setez deleteStartPos cu i
-            mov %ecx, deleteStartPos
-            iteratieDelete2:
-            # setez deleteFinPos cu i
-            mov %ecx, deleteFinPos
+            
+            
+            mov $0, (%edi, %ecx, 4)
             iteratieDelete1:
-
             inc %ecx
             jmp loopDelete1
             exitLoopDelete1:
-            # Acum sterg efectiv valorile
-            mov deleteFinPos, %edx
-            inc %edx
-            mov %edx, deleteFinPos
-            mov deleteStartPos, %ecx
-            #Verifi daca deleteStartPos e 1
-            cmp $1, %ecx
-            jne continueDelete
-            mov $0, %ecx
-            continueDelete:
-            mov deleteFinPos, %ebx
-            loopDelete2:
-            cmp %ebx, %ecx
-            je exitLoopDelete2
-            mov $0, (%edi, %ecx, 4)
-            inc %ecx
-            jmp loopDelete2
-            exitLoopDelete2:
 
             # Afisare tot vectorul
             lea memorie, %edi
