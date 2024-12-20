@@ -17,17 +17,17 @@ int main()
 
         if (operatie == 1) // ADD
         {
-            int nrFisiere;
-            cin >> nrFisiere; // se citeste nr de fisiere
-            for (int k = 0; k < nrFisiere; k++)
+            int nAdd;
+            cin >> nAdd; // se citeste nr de fisiere
+            for (int k = 0; k < nAdd; k++)
             {
-                int descriptor;
-                int spatiu;
-                cin >> descriptor >> spatiu; // se citeste descriptorul si spatiul
-                int spatiuBlocuri = spatiu / 8;
-                if (spatiu % 8 != 0)
+                int descriptorAdd;
+                int spatiuAddKb;
+                cin >> descriptorAdd >> spatiuAddKb; // se citeste descriptorul si spatiul
+                int spatiuAddBlocuri = spatiuAddKb / 8;
+                if (spatiuAddKb % 8 != 0)
                 {
-                    spatiuBlocuri++;
+                    spatiuAddBlocuri++;
                 }
 
                 bool foundSpace = false;
@@ -40,15 +40,15 @@ int main()
                         if (memorie[i * 1024 + j] == 0)
                         {
                             count++;
-                            if (count == spatiuBlocuri)
+                            if (count == spatiuAddBlocuri)
                             {
                                 // Am găsit un bloc suficient de mare
-                                for (int m = j - spatiuBlocuri + 1; m <= j; m++)
+                                for (int m = j - spatiuAddBlocuri + 1; m <= j; m++)
                                 {
-                                    memorie[i * 1024 + m] = descriptor;
+                                    memorie[i * 1024 + m] = descriptorAdd;
                                 }
                                 foundSpace = true;
-                                cout << descriptor << ": ((" << i << ", " << (j - spatiuBlocuri + 1) << "), (" << i << ", " << j << "))\n";
+                                cout << descriptorAdd << ": ((" << i << ", " << (j - spatiuAddBlocuri + 1) << "), (" << i << ", " << j << "))\n";
                                 break;
                             }
                         }
@@ -62,7 +62,7 @@ int main()
                 if (!foundSpace)
                 {
                     // Nu am găsit spațiu suficient
-                    cout << descriptor << ": ((0, 0), (0, 0))\n";
+                    cout << descriptorAdd << ": ((0, 0), (0, 0))\n";
                 }
             }
         }

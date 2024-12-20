@@ -6,6 +6,12 @@ nrOperatii: .space 4
 operatieCurentaLoopPrincipal: .long 0
 codOperatie: .space 4 # 1 = ADD, 2 = GET, 3 = DELETE, 4 = DEFRAG
 
+# Variabile pentru ADD
+nAdd: .space 4
+operatieCurentaAdd: .long 0
+descriptorAdd: .space 4
+spatiuAddKb: .space 4
+spatiuAddBlocuri: .space 4
 # Variabile de afisare
 formatCitireGet: .asciz "%d"
 
@@ -66,6 +72,49 @@ loopPrincipal:
     je operatieAdd
     jmp verificareCodOperatieGet
     operatieAdd:
+    #Citesc de cate ori se adauga ceva
+        push $nAdd
+        push $formatCitireGet
+        call scanf
+        add $8, %esp
+
+        #Fac un loop care se executa de nAdd ori
+        mov $0, operatieCurentaAdd
+        loopAdd1:
+        mov operatieCurentaAdd, %ecx
+        cmp nAdd, %ecx
+        je exitLoopAdd1
+        inc %ecx
+        mov %ecx, operatieCurentaAdd
+        #Citesc descriptorul
+        push $descriptorAdd
+        push $formatCitireGet
+        call scanf
+        add $8, %esp
+        #Citesc spatiul in KB
+        push $spatiuAddKb
+        push $formatCitireGet
+        call scanf
+        add $8, %esp
+        #Calculez nr de spatii de care avem nevoie
+        #Calculez restul impartirii lui spatiuAddKb la 8
+        xor %edx, %edx
+        mov spatiuAddKb, %eax
+        mov $8, %ebx
+        div %ebx
+        # Acum EAX conține rezultatul împărțirii, iar EDX conține restul
+        # Daca restul este 0, atunci spatiuAddBlocuri = EAX
+        cmp $0, %edx
+        je calculeazaSpatiuAddBlocuri
+        # Daca restul nu este 0, atunci spatiuAddBlocuri = EAX + 1
+        inc %eax
+        calculeazaSpatiuAddBlocuri:
+        mov %eax, spatiuAddBlocuri
+        # Am calculat spatiuAddBlocuri adica cate blocuri de 8KB avem nevoie
+
+
+        jmp loopAdd1
+        exitLoopAdd1:
 
         jmp exitOperatie
         #SFARSIT OPERATIE ADD
