@@ -16,9 +16,15 @@ foundSpaceAdd: .long 0
 countAdd: .long 0
 counterLoopAdd4: .long 0    # counter pentru loop ul 4 din ADD
 
+# Variabile pentru GET
+descriptorGet: .space 4
+foundGet: .long 0
+startGet: .long 0
+endGet: .long 0
 # Variabile de afisare
 formatCitireGet: .asciz "%d"
 formatAfisareAdd: .asciz "%d: ((%d, %d), (%d, %d))\n"
+formatAfisareGet: .asciz "((%d, %d), (%d, %d))\n"
 
 .text
 .global main
@@ -246,7 +252,79 @@ loopPrincipal:
     je operatieGet
     jmp verificareCodOperatieDelete
     operatieGet:
-        
+        # Citire descriptor
+        push %edi
+        push $descriptorGet
+        push $formatCitireGet
+        call scanf
+        addl $8, %esp
+        pop %edi # Am verificat, descriptorul se citeste corect
+
+        mov $0, foundGet
+        #for (int i = 0; i < 1024 && foundGet == 0; i++)
+        mov $0, %ecx
+        loopGet1:
+        cmp $1024, %ecx
+        je exitLoopGet1
+        cmp $0, foundGet
+        jne exitLoopGet1
+        #for (int j = 0; j < 1024; j++) // parcurgem coloanele
+        mov $0, %edx
+            loopGet2:
+            lea memorie, %edi
+            cmp $1024, %edx
+            je exitLoopGet2
+            #(memorie[i * 1024 + j] == descriptorGet)
+            mov %ecx, %eax
+            imul $1024, %eax
+            add %edx, %eax
+            mov (%edi, %eax, 4), %eax
+            cmp descriptorGet, %eax
+            jne continuareGet2
+                mov %edx, startGet
+                #while (j < 1024 && memorie[i * 1024 + j] == descriptor)
+                whileLoopGet1:
+                cmp $1024, %edx
+                je exitWhileLoopGet1
+                mov %ecx, %eax
+                imul $1024, %eax
+                add %edx, %eax
+                mov (%edi, %eax, 4), %eax
+                cmp descriptorGet, %eax
+                jne exitWhileLoopGet1
+                inc %edx
+                jmp whileLoopGet1
+                exitWhileLoopGet1:
+                dec %edx
+                mov %edx, endGet
+                mov $1, foundGet
+                #Facem afisarea i, startGet, i, endGet
+                push endGet
+                push %ecx
+                push startGet
+                push %ecx
+                push $formatAfisareGet
+                call printf
+                add $20, %esp
+                jmp exitLoopGet2
+            continuareGet2:
+            inc %edx
+            jmp loopGet2
+        exitLoopGet2:
+        inc %ecx
+        jmp loopGet1
+        exitLoopGet1:
+        # daca foundGet == 0, atunci printf"((0, 0), (0, 0))\n";
+        cmp $0, foundGet
+        jne continuareGet1
+        push $0
+        push $0
+        push $0
+        push $0
+        push $formatAfisareGet
+        call printf
+        add $20, %esp
+        continuareGet1:
         jmp exitOperatie
         #SFARSIT OPERATIE GET
 

@@ -72,27 +72,27 @@ int main()
             int descriptor;
             cin >> descriptor; // se citeste descriptorul
 
-            bool found = false;
-            for (int i = 0; i < 1024 && !found; i++) // parcurgem liniile
+            bool foundGet = false;
+            for (int i = 0; i < 1024 && foundGet == 0; i++) // parcurgem liniile
             {
                 for (int j = 0; j < 1024; j++) // parcurgem coloanele
                 {
                     if (memorie[i * 1024 + j] == descriptor)
                     {
-                        int start = j;
+                        int startGet = j;
                         while (j < 1024 && memorie[i * 1024 + j] == descriptor)
                         {
                             j++;
                         }
-                        int end = j - 1;
-                        cout << "((" << i << ", " << start << "), (" << i << ", " << end << "))\n";
-                        found = true;
+                        int endGet = j - 1;
+                        cout << "((" << i << ", " << startGet << "), (" << i << ", " << endGet << "))\n";
+                        foundGet = true;
                         break;
                     }
                 }
             }
 
-            if (!found)
+            if (!foundGet)
             {
                 // Nu am găsit descriptorul
                 cout << "((0, 0), (0, 0))\n";
@@ -123,14 +123,14 @@ int main()
                 {
                     if (memorie[i * 1024 + j] != 0)
                     {
-                        int start = j;
+                        int startGet = j;
                         int descriptor = memorie[i * 1024 + j];
                         while (j < 1024 && memorie[i * 1024 + j] == descriptor)
                         {
                             j++;
                         }
-                        int end = j - 1;
-                        cout <<descriptor << ": ((" << i << ", " << start << "), (" << i << ", " << end << "))\n";
+                        int endGet = j - 1;
+                        cout <<descriptor << ": ((" << i << ", " << startGet << "), (" << i << ", " << endGet << "))\n";
                     }
                     else
                     {
@@ -215,14 +215,14 @@ int main()
                 {
                     if (memorie[i * 1024 + j] != 0)
                     {
-                        int start = j;
+                        int startGet = j;
                         int descriptor = memorie[i * 1024 + j];
                         while (j < 1024 && memorie[i * 1024 + j] == descriptor)
                         {
                             j++;
                         }
-                        int end = j - 1;
-                        cout <<descriptor << ": ((" << i << ", " << start << "), (" << i << ", " << end << "))\n";
+                        int endGet = j - 1;
+                        cout <<descriptor << ": ((" << i << ", " << startGet << "), (" << i << ", " << endGet << "))\n";
                     }
                     else
                     {
