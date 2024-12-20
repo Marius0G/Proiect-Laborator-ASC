@@ -12,8 +12,13 @@ operatieCurentaAdd: .long 0
 descriptorAdd: .space 4
 spatiuAddKb: .space 4
 spatiuAddBlocuri: .space 4
+foundSpaceAdd: .long 0
+countAdd: .long 0
+counterLoopAdd4: .long 0    # counter pentru loop ul 4 din ADD
+
 # Variabile de afisare
 formatCitireGet: .asciz "%d"
+formatAfisareAdd: .asciz "%d: ((%d, %d), (%d, %d))\n"
 
 .text
 .global main
@@ -112,10 +117,126 @@ loopPrincipal:
         mov %eax, spatiuAddBlocuri
         # Am calculat spatiuAddBlocuri adica cate blocuri de 8KB avem nevoie
 
+        mov $0, foundSpaceAdd
+        #for (int i = 0; i < 1024 && foundSpaceAdd == 0; i++)
+        # ecx = i si edx = j
+        mov $0, %ecx
+            loopAdd2:
+            cmp $1024, %ecx
+            je exitLoopAdd2
+            cmp $0, foundSpaceAdd
+            jne exitLoopAdd2
+
+            mov $0, countAdd
+            #for (int j = 0; j < 1024; j++) // parcurgem coloanele
+            mov $0, %edx
+                loopAdd3:
+                lea memorie, %edi
+                cmp $1024, %edx
+                je exitLoopAdd3
+
+                #(memorie[i * 1024 + j] == 0)
+                mov %ecx, %eax
+                imul $1024, %eax
+                add %edx, %eax
+                #acum eax e i * 1024 + j
+                mov (%edi, %eax, 4), %eax
+                cmp $0, %eax
+                je ifAdd1
+                jmp ifAdd1Else
+                ifAdd1:
+                mov countAdd, %eax
+                inc %eax
+                mov %eax, countAdd
+
+                #(count == spatiuAddBlocuri)
+                cmp spatiuAddBlocuri, %eax
+                je ifAdd2
+                jmp exitIfAdd2
+                    ifAdd2:
+                    lea memorie, %edi
+                    #inseamna ca am gasit un bloc sufieicent de mare
+                    #for (int m = j - spatiuAddBlocuri + 1; m <= j; m++)
+                    mov %edx, %eax
+                    sub spatiuAddBlocuri, %eax
+                    inc %eax
+                    mov %eax, counterLoopAdd4
+                        loopAdd4:
+                        mov counterLoopAdd4, %eax
+                        cmp %edx, %eax
+                        jg exitLoopAdd4
+                        # memorie[i * 1024 + m] = descriptorAdd;
+                        mov %ecx, %eax
+                        imul $1024, %eax
+                        add counterLoopAdd4, %eax
+                        mov descriptorAdd, %ebx
+                        mov %ebx, (%edi, %eax, 4)
+
+                        mov counterLoopAdd4, %eax
+                        inc %eax
+                        mov %eax, counterLoopAdd4
+                        jmp loopAdd4
+                    exitLoopAdd4:
+                    mov $1, foundSpaceAdd
+                    #Facem afisarea
+                    push %eax
+                    push %ebx
+                    push %ecx
+                    push %edx
+                    push %edx
+                    push %ecx
+                    #(j - spatiuAddBlocuri + 1)
+                    mov %edx, %eax
+                    sub spatiuAddBlocuri, %eax
+                    inc %eax
+                    push %eax
+                    push %ecx
+                    push descriptorAdd
+                    push $formatAfisareAdd
+                    call printf
+                    add $24, %esp
+                    pop %edx
+                    pop %ecx
+                    pop %ebx
+                    pop %eax
+                    lea memorie, %edi
+                    jmp exitLoopAdd3
+                    jmp exitIfAdd2
+                exitIfAdd2:
+                jmp exitIfAdd1
+                ifAdd1Else:
+                mov $0, countAdd
+                jmp exitIfAdd1
+                exitIfAdd1:
+                inc %edx
+                jmp loopAdd3
+            exitLoopAdd3:
+            inc %ecx
+            jmp loopAdd2
+        exitLoopAdd2:
+        cmp $0, foundSpaceAdd
+        jne ifAdd3
+        push %eax
+        push %ebx
+        push %ecx
+        push %edx
+        push $0
+        push $0
+        push $0
+        push $0
+        push descriptorAdd
+        push $formatAfisareAdd
+        call printf
+        add $24, %esp
+        pop %edx
+        pop %ecx
+        pop %ebx
+        pop %eax
+        ifAdd3:
 
         jmp loopAdd1
         exitLoopAdd1:
-
+    
         jmp exitOperatie
         #SFARSIT OPERATIE ADD
 

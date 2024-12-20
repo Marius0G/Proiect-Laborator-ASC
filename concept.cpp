@@ -30,9 +30,9 @@ int main()
                     spatiuAddBlocuri++;
                 }
 
-                bool foundSpace = false;
+                int foundSpaceAdd = 0;
 
-                for (int i = 0; i < 1024 && !foundSpace; i++) // parcurgem liniile
+                for (int i = 0; i < 1024 && foundSpaceAdd == 0; i++) // parcurgem liniile
                 {
                     int count = 0;
                     for (int j = 0; j < 1024; j++) // parcurgem coloanele
@@ -47,7 +47,7 @@ int main()
                                 {
                                     memorie[i * 1024 + m] = descriptorAdd;
                                 }
-                                foundSpace = true;
+                                foundSpaceAdd = 1;
                                 cout << descriptorAdd << ": ((" << i << ", " << (j - spatiuAddBlocuri + 1) << "), (" << i << ", " << j << "))\n";
                                 break;
                             }
@@ -59,7 +59,7 @@ int main()
                     }
                 }
 
-                if (!foundSpace)
+                if (foundSpaceAdd == 0)
                 {
                     // Nu am găsit spațiu suficient
                     cout << descriptorAdd << ": ((0, 0), (0, 0))\n";
