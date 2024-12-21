@@ -21,10 +21,17 @@ descriptorGet: .space 4
 foundGet: .long 0
 startGet: .long 0
 endGet: .long 0
+
+# Variabile pentru DELETE
+descriptorDelete: .space 4
+startAfisareDelete: .long 0
+endAfisareDelete: .long 0
+descriptorAfisareDelete: .long 0
 # Variabile de afisare
 formatCitireGet: .asciz "%d"
 formatAfisareAdd: .asciz "%d: ((%d, %d), (%d, %d))\n"
 formatAfisareGet: .asciz "((%d, %d), (%d, %d))\n"
+formatAfisareDelete: .asciz "%d: ((%d, %d), (%d, %d))\n"
 
 .text
 .global main
@@ -334,7 +341,117 @@ loopPrincipal:
     je operatieDelete
     jmp verificareCodOperatieDefrag
     operatieDelete:
-        
+        push $descriptorDelete
+        push $formatCitireGet
+        call scanf
+        add $8, %esp
+
+        #for (int i = 0; i < 1024; i++)
+        mov $0, %ecx
+        loopDelete1:
+        cmp $1024, %ecx
+        je exitLoopDelete1
+        #for (int j = 0; j < 1024; j++) // parcurgem coloanele
+        mov $0, %edx
+            loopDelete2:
+            lea memorie, %edi
+            cmp $1024, %edx
+            je exitLoopDelete2
+            #(memorie[i * 1024 + j] == descriptorDelete)
+            mov %ecx, %eax
+            imul $1024, %eax
+            add %edx, %eax
+            mov (%edi, %eax, 4), %eax
+            cmp descriptorDelete, %eax
+            jne continueDelete1
+                lea memorie, %edi
+                mov %ecx, %eax
+                imul $1024, %eax
+                add %edx, %eax
+                mov $0, %ebx
+                mov %ebx, (%edi, %eax, 4)
+            continueDelete1:
+            inc %edx
+            jmp loopDelete2
+            exitLoopDelete2:
+        inc %ecx
+        jmp loopDelete1
+        exitLoopDelete1:
+
+        # Afisare toata memoria sub forma filedescriptor: ((linieStart, coloanaStart), (linieEnd, coloanaEnd))
+        mov $0, %ecx
+        loopAfisareMemorie1:
+        cmp $1024, %ecx
+        je exitLoopAfisareMemorie1
+
+        mov $0, %edx
+            loopAfisareMemorie2:
+            # while (j < 1024)
+            cmp $1024, %edx
+            je exitLoopAfisareMemorie2
+            # (memorie[i * 1024 + j] != 0)
+            lea memorie, %edi
+            mov %ecx, %eax
+            imul $1024, %eax
+            add %edx, %eax
+            mov (%edi, %eax, 4), %eax
+            cmp $0, %eax
+            jne ifAfisareMemorie1
+            jmp ifAfisareMemorie1Else
+            ifAfisareMemorie1:
+            mov %edx, startAfisareDelete
+            # descriptorAfisareDelete = memorie[i * 1024 + j]
+            mov %ecx, %eax
+            imul $1024, %eax
+            add %edx, %eax
+            mov (%edi, %eax, 4), %eax
+            mov %eax, descriptorAfisareDelete
+            # while (j < 1024 && memorie[i * 1024 + j] == descriptorAfisareDelete)
+            whileAfisareMemorie1:
+            cmp $1024, %edx
+            je exitWhileAfisareMemorie1
+            lea memorie, %edi
+            mov %ecx, %eax
+            imul $1024, %eax
+            add %edx, %eax
+            mov (%edi, %eax, 4), %eax
+            cmp descriptorAfisareDelete, %eax
+            jne exitWhileAfisareMemorie1
+            inc %edx
+            jmp whileAfisareMemorie1
+            exitWhileAfisareMemorie1:
+            dec %edx
+            mov %edx, endAfisareDelete
+            inc %edx
+            # Afisare
+            push %eax
+            push %ebx
+            push %ecx
+            push %edx
+            push endAfisareDelete
+            push %ecx
+            push startAfisareDelete
+            push %ecx
+            push descriptorAfisareDelete
+            push $formatAfisareDelete
+            call printf
+            add $24, %esp
+            pop %edx
+            pop %ecx
+            pop %ebx
+            pop %eax
+            #end afisare
+            jmp ifAfisareMemorie1Exit
+            ifAfisareMemorie1Else:
+            inc %edx
+            jmp ifAfisareMemorie1Exit
+            ifAfisareMemorie1Exit:
+            jmp loopAfisareMemorie2
+            exitLoopAfisareMemorie2:
+        inc %ecx
+        jmp loopAfisareMemorie1
+        exitLoopAfisareMemorie1:
+        # STOP AFISARE MEMORIE
         jmp exitOperatie
         #SFARSIT OPERATIE DELETE
 
