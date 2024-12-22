@@ -4,7 +4,8 @@
 using namespace std;
 
 int memorie[1024 * 1024] = {0}; // initializez memoria cu 0, simulez o matrice de 1024 pe 1024
-
+int vectorDefragDescriptori[1024] = {0}; // vectorul de descriptori pentru defrag
+int vectorDefragSpatii[1024] = {0}; // vectorul de spatiu pentru defrag
 int main()
 {
     int nrOperatii;
@@ -141,70 +142,161 @@ int main()
         }
         if (operatie == 4) // DEFRAG
         {
-            // Implementare DEFRAG
-            for (int i = 0; i < 1023; i++) // Parcurgem liniile, până la penultima linie
+            // // Implementare DEFRAG
+            // for (int i = 0; i < 1023; i++) // Parcurgem liniile, până la penultima linie
+            // {
+            //     int k = 0; // Index pentru poziția de inserare pe linia curentă
+            //     // Compactăm valorile nenule pe linia curentă
+            //     for (int j = 0; j < 1024; j++)
+            //     {
+            //         if (memorie[i * 1024 + j] != 0)
+            //         {
+            //             memorie[i * 1024 + k] = memorie[i * 1024 + j];
+            //             if (k != j)
+            //             {
+            //                 memorie[i * 1024 + j] = 0;
+            //             }
+            //             k++;
+            //         }
+            //     }
+
+            //     // Mutăm valorile din liniile următoare pe linia curentă
+            //     for (int l = i + 1; l < 1024; l++) // Iterăm toate liniile de dedesubt
+            //     {
+            //         int nextLineIndex = l * 1024;
+            //         for (int j = 0; j < 1024;)
+            //         {
+            //             if (memorie[nextLineIndex + j] != 0)
+            //             {
+            //                 int descriptor = memorie[nextLineIndex + j];
+            //                 int count = 0;
+
+            //                 // Determinăm lungimea grupului (descriptorului)
+            //                 while (j + count < 1024 && memorie[nextLineIndex + j + count] == descriptor)
+            //                 {
+            //                     count++;
+            //                 }
+
+            //                 // Verificăm dacă întreg grupul încape pe linia curentă
+            //                 if (k + count <= 1024)
+            //                 {
+            //                     for (int m = 0; m < count; m++)
+            //                     {
+            //                         memorie[i * 1024 + k] = memorie[nextLineIndex + j];
+            //                         memorie[nextLineIndex + j] = 0;
+            //                         k++;
+            //                         j++;
+            //                     }
+            //                 }
+            //                 else
+            //                 {
+            //                     break; // Dacă nu încape întregul grup, oprim mutarea
+            //                 }
+            //             }
+            //             else
+            //             {
+            //                 j++;
+            //             }
+            //         }
+
+            //         // Dacă linia curentă este plină, ieșim din buclă
+            //         if (k == 1024)
+            //         {
+            //             break;
+            //         }
+            //     }
+            // }
+
+
+        ///Implementare defrag cu add si delete in loc de mutare
+        int nrDescriptoriDefrag = 0;
+        int descriptorAnterior = 1025;
+        for(int i=0; i< 1024; i++){
+            vectorDefragDescriptori[i] = 0;
+        } 
+        for(int i=0; i< 1024; i++){
+            vectorDefragSpatii[i] = 0;
+        } 
+        for(int i = 0; i < 1024; i++) // parcurgem liniile
+        {
+            int j = 0;
+            
+            while(j < 1024)
             {
-                int k = 0; // Index pentru poziția de inserare pe linia curentă
-                // Compactăm valorile nenule pe linia curentă
-                for (int j = 0; j < 1024; j++)
+                int spatiucurent = 0;
+                if (descriptorAnterior == 1025 && memorie[i * 1024 + j] != 0) // ifDefrag1
                 {
-                    if (memorie[i * 1024 + j] != 0)
+                    descriptorAnterior = memorie[i * 1024 + j];
+                    vectorDefragDescriptori[nrDescriptoriDefrag] = descriptorAnterior;
+                    while(j < 1024 && memorie[i * 1024 + j] == descriptorAnterior)
                     {
-                        memorie[i * 1024 + k] = memorie[i * 1024 + j];
-                        if (k != j)
-                        {
-                            memorie[i * 1024 + j] = 0;
-                        }
-                        k++;
+                        spatiucurent++;
+                        j++;
                     }
+                    vectorDefragSpatii[nrDescriptoriDefrag] = spatiucurent;
+                    nrDescriptoriDefrag++;
                 }
-
-                // Mutăm valorile din liniile următoare pe linia curentă
-                for (int l = i + 1; l < 1024; l++) // Iterăm toate liniile de dedesubt
+                else
                 {
-                    int nextLineIndex = l * 1024;
-                    for (int j = 0; j < 1024;)
+                    if (memorie[i * 1024 + j] != descriptorAnterior && memorie[i * 1024 + j] != 0)
                     {
-                        if (memorie[nextLineIndex + j] != 0)
+                        descriptorAnterior = memorie[i * 1024 + j];
+                        vectorDefragDescriptori[nrDescriptoriDefrag] = descriptorAnterior;
+                        while(j < 1024 && memorie[i * 1024 + j] == descriptorAnterior)
                         {
-                            int descriptor = memorie[nextLineIndex + j];
-                            int count = 0;
-
-                            // Determinăm lungimea grupului (descriptorului)
-                            while (j + count < 1024 && memorie[nextLineIndex + j + count] == descriptor)
-                            {
-                                count++;
-                            }
-
-                            // Verificăm dacă întreg grupul încape pe linia curentă
-                            if (k + count <= 1024)
-                            {
-                                for (int m = 0; m < count; m++)
-                                {
-                                    memorie[i * 1024 + k] = memorie[nextLineIndex + j];
-                                    memorie[nextLineIndex + j] = 0;
-                                    k++;
-                                    j++;
-                                }
-                            }
-                            else
-                            {
-                                break; // Dacă nu încape întregul grup, oprim mutarea
-                            }
-                        }
-                        else
-                        {
+                            spatiucurent++;
                             j++;
                         }
+                        vectorDefragSpatii[nrDescriptoriDefrag] = spatiucurent;
+                        nrDescriptoriDefrag++;
                     }
-
-                    // Dacă linia curentă este plină, ieșim din buclă
-                    if (k == 1024)
+                    else
                     {
-                        break;
+                        j++;
                     }
                 }
             }
+        }
+
+        for(int i = 0; i < 1024; i++) // parcurgem liniile
+        {
+            for(int j = 0; j < 1024; j++)
+            {
+                memorie[i * 1024 + j] = 0;
+            }
+        }
+
+        for(int l=0; l<nrDescriptoriDefrag; l++)
+        {
+            int descriptorAdd = vectorDefragDescriptori[l];
+            int spatiuAddBlocuri = vectorDefragSpatii[l];
+            int foundSpaceAdd = 0;
+            for (int i = 0; i < 1024 && foundSpaceAdd == 0; i++) // parcurgem liniile
+            {
+                int count = 0;
+                for (int j = 0; j < 1024; j++) // parcurgem coloanele
+                {
+                    if (memorie[i * 1024 + j] == 0)
+                    {
+                        count++;
+                        if (count == spatiuAddBlocuri)
+                        {
+                            // Am găsit un bloc suficient de mare
+                            for (int m = j - spatiuAddBlocuri + 1; m <= j; m++)
+                            {
+                                memorie[i * 1024 + m] = descriptorAdd;
+                            }
+                            foundSpaceAdd = 1;
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        count = 0; // resetăm contorul dacă găsim un element diferit de 0
+                    }
+                }
+            }
+        }
 
         // afisare dupa defrag
         // Afișare toată memoria sub forma ((linieStart, coloanaStart), (linieEnd, coloanaEnd))
