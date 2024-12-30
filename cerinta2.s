@@ -35,12 +35,20 @@ nrDescriptoriDefrag: .long 0
 descriptorAnterior: .long 1025
 spatiuCurent: .long 0
 lDefrag: .long 0
+
+# Variabile pentru CONCRETE
+filepath: .space 256
+fds: .space 4
+fd: .space 4
+size: .space 4
+statbuf: .space 128
 # Variabile de afisare
 formatCitireGet: .asciz "%d"
 formatAfisareAdd: .asciz "%d: ((%d, %d), (%d, %d))\n"
 formatAfisareGet: .asciz "((%d, %d), (%d, %d))\n"
 formatAfisareDelete: .asciz "%d: ((%d, %d), (%d, %d))\n"
 
+fdebug: .asciz "%s\n"
 .text
 .global main
 main:
@@ -467,7 +475,7 @@ loopPrincipal:
     verificareCodOperatieDefrag:
         cmp $4, codOperatie
         je operatieDefrag
-        jmp exitOperatie
+        jmp verificareCodOperatieConcrete
     operatieDefrag:
         mov $0, nrDescriptoriDefrag
         mov $1025, descriptorAnterior
@@ -783,6 +791,173 @@ loopPrincipal:
         jmp exitOperatie
         #SFARSIT OPERATIE DEFRAG
     
+    verificareCodOperatieConcrete:
+        cmp $5, codOperatie
+        je operatieConcrete
+        jmp exitOperatie
+    operatieConcrete:
+    # sys_read
+    movl $3, %eax            
+    movl $0, %ebx            
+    movl $filepath, %ecx       
+    movl $255, %edx          
+    int $0x80
+
+    movl    filepath, %eax
+    subl    $8, %esp
+    pushl   $0
+    pushl   %eax
+    call    open
+    addl    $16, %esp
+    movl    %eax, fds
+
+    mov fds, %eax
+    movl $255, %ebx
+    xor %edx, %edx
+    div %ebx
+    mov %edx, %eax
+    inc %eax
+    mov %eax, fd
+
+    mov $108, %eax
+    mov fds, %ebx
+    lea statbuf, %ecx
+    int $0x80
+
+    lea statbuf, %ecx
+    movl 0x8(%ecx), %eax
+    mov $1024, %ebx
+    xor %edx, %edx
+    div %ebx
+    mov %eax, size
+
+    mov fd, %eax
+    mov %eax, descriptorAdd
+    mov size, %eax
+    mov %eax, spatiuAddKb
+    xor %edx, %edx
+    mov spatiuAddKb, %eax
+    mov $8, %ebx
+    div %ebx
+    inc %eax
+    mov %eax, spatiuAddBlocuri
+
+    mov $0, foundSpaceAdd
+        #for (int i = 0; i < 1024 && foundSpaceAdd == 0; i++)
+        # ecx = i si edx = j
+        mov $0, %ecx
+            loopAdd2c:
+            cmp $1024, %ecx
+            je exitLoopAdd2c
+            cmp $0, foundSpaceAdd
+            jne exitLoopAdd2c
+
+            mov $0, countAdd
+            #for (int j = 0; j < 1024; j++) // parcurgem coloanele
+            mov $0, %edx
+                loopAdd3c:
+                lea memorie, %edi
+                cmp $1024, %edx
+                je exitLoopAdd3c
+
+                #(memorie[i * 1024 + j] == 0)
+                mov %ecx, %eax
+                imul $1024, %eax
+                add %edx, %eax
+                #acum eax e i * 1024 + j
+                mov (%edi, %eax, 4), %eax
+                cmp $0, %eax
+                je ifAdd1c
+                jmp ifAdd1Elsec
+                ifAdd1c:
+                mov countAdd, %eax
+                inc %eax
+                mov %eax, countAdd
+
+                #(count == spatiuAddBlocuri)
+                cmp spatiuAddBlocuri, %eax
+                je ifAdd2c
+                jmp exitIfAdd2c
+                    ifAdd2c:
+                    lea memorie, %edi
+                    #inseamna ca am gasit un bloc sufieicent de mare
+                    #for (int m = j - spatiuAddBlocuri + 1; m <= j; m++)
+                    mov %edx, %eax
+                    sub spatiuAddBlocuri, %eax
+                    inc %eax
+                    mov %eax, counterLoopAdd4
+                        loopAdd4c:
+                        mov counterLoopAdd4, %eax
+                        cmp %edx, %eax
+                        jg exitLoopAdd4c
+                        # memorie[i * 1024 + m] = descriptorAdd;
+                        mov %ecx, %eax
+                        imul $1024, %eax
+                        add counterLoopAdd4, %eax
+                        mov descriptorAdd, %ebx
+                        mov %ebx, (%edi, %eax, 4)
+
+                        mov counterLoopAdd4, %eax
+                        inc %eax
+                        mov %eax, counterLoopAdd4
+                        jmp loopAdd4c
+                    exitLoopAdd4c:
+                    mov $1, foundSpaceAdd
+                    #Facem afisarea
+                    push %eax
+                    push %ebx
+                    push %ecx
+                    push %edx
+                    push %edx
+                    push %ecx
+                    #(j - spatiuAddBlocuri + 1)
+                    mov %edx, %eax
+                    sub spatiuAddBlocuri, %eax
+                    inc %eax
+                    push %eax
+                    push %ecx
+                    push descriptorAdd
+                    push $formatAfisareAdd
+                    call printf
+                    add $24, %esp
+                    pop %edx
+                    pop %ecx
+                    pop %ebx
+                    pop %eax
+                    lea memorie, %edi
+                    jmp exitLoopAdd3c
+                    jmp exitIfAdd2c
+                exitIfAdd2c:
+                jmp exitIfAdd1c
+                ifAdd1Elsec:
+                mov $0, countAdd
+                jmp exitIfAdd1c
+                exitIfAdd1c:
+                inc %edx
+                jmp loopAdd3c
+            exitLoopAdd3c:
+            inc %ecx
+            jmp loopAdd2c
+        exitLoopAdd2c:
+        cmp $0, foundSpaceAdd
+        jne ifAdd3c
+        push %eax
+        push %ebx
+        push %ecx
+        push %edx
+        push $0
+        push $0
+        push $0
+        push $0
+        push descriptorAdd
+        push $formatAfisareAdd
+        call printf
+        add $24, %esp
+        pop %edx
+        pop %ecx
+        pop %ebx
+        pop %eax
+        ifAdd3c: 
     exitOperatie:
 
     #Final loop principal

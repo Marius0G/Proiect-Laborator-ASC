@@ -1,11 +1,16 @@
 #include <iostream>
 #include <fstream>
-
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <dirent.h>
 using namespace std;
 
 int memorie[1024 * 1024] = {0}; // initializez memoria cu 0, simulez o matrice de 1024 pe 1024
 int vectorDefragDescriptori[1024] = {0}; // vectorul de descriptori pentru defrag
 int vectorDefragSpatii[1024] = {0}; // vectorul de spatiu pentru defrag
+
+char *filepath;
 int main()
 {
     int nrOperatii;
@@ -325,5 +330,9 @@ int main()
         }
     }
 
+    if(operatie == 5) // CONCRETE
+    {
+        return 0;
+    }
     return 0;
 }
